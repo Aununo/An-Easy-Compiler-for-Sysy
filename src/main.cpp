@@ -3,7 +3,6 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <sstream>
 
 #include "../include/ast.hpp"
 using namespace std;
@@ -25,13 +24,9 @@ int main(int argc, const char *argv[]) {
   auto ret = yyparse(ast);
   assert(!ret);
 
-  stringstream ir_stream;
-  streambuf* old_buf = cout.rdbuf(ir_stream.rdbuf());
+
   //ast->Dump();
   //cout << endl;
-  string ir_code = ir_stream.str();
-  const char* str = ir_code.c_str();
-  
   freopen(output, "w", stdout);
 
   ast->GenIR();
