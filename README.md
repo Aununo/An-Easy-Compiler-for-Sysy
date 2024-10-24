@@ -1,6 +1,6 @@
 # An Easy Compiler for Sysy
 
-(Unfinished) I'm interested in implementing a compiler or an interpreter for my designed programming language. This is a first quick try for me. 😊
+(Unfinished) A very first quick try for implementing a compiler. 😊
 
 ## 🕶Compiler vs Interpreter
 
