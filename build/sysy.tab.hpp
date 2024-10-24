@@ -73,8 +73,9 @@ union YYSTYPE
   std::string *str_val;
   int int_val;
   BaseAST *ast_val;
+  char op_val;
 
-#line 78 "/root/compiler/build/sysy.tab.hpp"
+#line 79 "/root/compiler/build/sysy.tab.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

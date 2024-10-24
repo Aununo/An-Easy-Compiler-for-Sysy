@@ -1,39 +1,61 @@
 # An Easy Compiler for Sysy
 
-A brief report with my ideas for the PKU compiler learning.
+(Unfinished) I'm interested in implementing a compiler or an interpreter for my designed programming language. This is a first quick try for me. 😊
 
-## 0. Environment
+## 🕶Compiler vs Interpreter
 
-*Platform:* Ubuntu 24.04; 
+![img](https://pic.imgdb.cn/item/6719c21fd29ded1a8c8ae318.png)
 
-*Language:* C++; 
+**Compiled languages**: Convert source code into machine code through a compilation process, resulting in a standalone executable file that is efficient to run.
 
-*IDE:* VS Code;
+![img](https://pic.imgdb.cn/item/6719c26fd29ded1a8c8b2c3a.png)
 
-*Reference:* https://pku-minic.github.io/online-doc/#/.
+**Interpreted languages**: Execute source code line by line using an interpreter, generally without pre-compilation. They are great for rapid development and debugging.
 
-### Docker
+**Blurred boundary**: Modern languages increasingly use both interpretation and compilation techniques to achieve better performance and flexibility, making the distinction between the two less rigid.
 
-First, you should install docker on your platform. This command will help you get the mirror of **pku** practice experiment.
+## ⚙️General Structure
+
+![img](https://pic.imgdb.cn/item/6719b894d29ded1a8c817fb8.png)
+
+To implement a compiler, we can divide the whole process into **THREE** main parts.
+
+- ***FrontEnd:*** Through **lexical and syntactic analysis**, the **source code**(SRC) is parsed into an **abstract syntax tree** (AST). Through **semantic** analysis, the AST is scanned to check whether there are semantic errors. Mainly use **flex & bison**.
+- ***MidEnd:*** **IR**(Intermediate Representation) is an abstract, lower-level code format that simplifies the structure of the original SRC, making it easier(M*N to M+N) for the backend to process. It performs **optimizations**, such as DCE, Constant Propagation etc.
+- ***BackEnd:*** Takes the optimized IR and translates it into **assembly code**(ASM) for the target architecture (machine-specific).
+
+The assembler takes the assembly code and converts it into machine code, creating an **executable** binary file. This is the code that the machine can directly run.
+
+## 🐳Docker
+
+*Language:* C++; *IDE:* VS Code;*Platform:* Ubuntu 24.04, WSL; *Reference:* https://pku-minic.github.io/online-doc/#/.
+
+This command will help to get the mirror of **pku** practice experiment.
 
 ```bash
 docker pull maxxing/compiler-dev
 ```
-And this helps 'move' your local project into the test environment.
+Tools like `flex`, `bison`, `make`, `qemu-user-static`, `LLVM-toolschain`, `koopapac`, and `autotest`... are already there.
+
+And this helps to 'move' your local project into the test environment.
+
 ```bash
 docker run -it --rm -v /home/your_path:/root/compiler maxxing/compiler-dev bash
 ```
-If wanna exit, just type `exit` or `Ctrl+D`.
-
-### Make
-
-[sysy-make-template](https://github.com/pku-minic/sysy-make-template)、[sysy-cmake-template](https://github.com/pku-minic/sysy-cmake-template)
-
-
+If wanna exit, just type `exit` or `Ctrl+D`. [sysy-make-template](https://github.com/pku-minic/sysy-make-template)、[sysy-cmake-template](https://github.com/pku-minic/sysy-cmake-template)
 
 ```bash
 make
 build/compiler -koopa hello.c -o hello.koopa
+build/compiler -riscv hello.c -o hello.S
+autotest -koopa -s lv1 /root/compiler
+autotest -riscv -s lv1 /root/compiler
 ```
 
-
+I use git to push my local project to my github.
+```bash
+git init
+git remote set-url origin git@github.com:Aununo/An-Easy-Compiler-for-Sysy.git
+git add . & git commit -m "anything"
+git push origin "branch"
+```

@@ -24,18 +24,13 @@ using namespace std;
   std::string *str_val;
   int int_val;
   BaseAST *ast_val;
-  char op_val;
 }
 
 %token INT RETURN
 %token <str_val> IDENT
 %token <int_val> INT_CONST
 
-%left '+' '-'
-%left '!' 
-
-%type <ast_val> FuncDef FuncType Block Stmt Exp UnaryExp PrimaryExp Number
-%type <op_val> UnaryOp
+%type <ast_val> FuncDef FuncType Block Stmt Number
 
 %%
 
@@ -49,10 +44,9 @@ CompUnit
 FuncDef
   : FuncType IDENT '(' ')' Block {
     auto func_def = std::make_unique<FuncDefAST>(
-        std::unique_ptr<BaseAST>($1),              
-        *$2,                                      
+        std::unique_ptr<BaseAST>($1),               
+        *$2,                                       
         std::unique_ptr<BaseAST>($5));            
-    delete $2;
     $$ = func_def.release(); 
   }
   ;
@@ -71,33 +65,16 @@ Block
   ;
 
 Stmt
-  : RETURN Exp ';' {
-    $$ = new StmtAST(std::unique_ptr<BaseAST>($2)); 
+  : RETURN Number ';' {
+    auto stmt = std::make_unique<StmtAST>(std::unique_ptr<BaseAST>($2));
+    $$ = stmt.release();
   }
   ;
 
-Exp
-  : UnaryExp { $$ = $1; }
-  ;
-
-UnaryExp
-  : PrimaryExp
-  | UnaryOp UnaryExp { $$ = new UnaryExpAST($1, std::unique_ptr<BaseAST>($2)); }
-  ;
-
-PrimaryExp
-  : '(' Exp ')' { $$ = $2; }
-  | Number { $$ = $1; }
-  ;
-
-UnaryOp
-  : '+' { $$ = '+'; }
-  | '-' { $$ = '-'; }
-  | '!' { $$ = '!'; }
-  ;
-
 Number
-  : INT_CONST { $$ = new NumberAST($1); }
+  : INT_CONST {
+    $$ = new NumberAST($1);
+  }
   ;
 
 %%
