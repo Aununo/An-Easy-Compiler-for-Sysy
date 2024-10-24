@@ -46,11 +46,13 @@ extern int yydebug;
 /* "%code requires" blocks.  */
 #line 1 "/root/compiler/src/sysy.y"
 
+  #define YYLTYPE_IS_DECLARED 1
+  extern int yylineno;
   #include <memory>
   #include <string>
   #include "../include/ast.hpp"
 
-#line 54 "/root/compiler/build/sysy.tab.hpp"
+#line 56 "/root/compiler/build/sysy.tab.hpp"
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -60,7 +62,13 @@ extern int yydebug;
     INT = 258,
     RETURN = 259,
     IDENT = 260,
-    INT_CONST = 261
+    INT_CONST = 261,
+    AND_OP = 262,
+    OR_OP = 263,
+    EQ_OP = 264,
+    NEQ_OP = 265,
+    LE_OP = 266,
+    GE_OP = 267
   };
 #endif
 
@@ -68,14 +76,14 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 23 "/root/compiler/src/sysy.y"
+#line 25 "/root/compiler/src/sysy.y"
 
   std::string *str_val;
   int int_val;
   BaseAST *ast_val;
   char op_val;
 
-#line 79 "/root/compiler/build/sysy.tab.hpp"
+#line 87 "/root/compiler/build/sysy.tab.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

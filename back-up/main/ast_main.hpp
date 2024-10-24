@@ -5,11 +5,11 @@
 
 /* 
 CompUnitAST { FuncDefAST { FuncTypeAST { int }, main, BlockAST { StmtAST { 0 } } } }
+
 fun @main(): i32 { 
 %entry:            
   ret 0            
 }
-
 */
 
 class BaseAST {
@@ -23,7 +23,6 @@ class BaseAST {
 class CompUnitAST : public BaseAST {
   public:
    std::unique_ptr<BaseAST> func_def;
-
 
    CompUnitAST(std::unique_ptr<BaseAST> func_def) : func_def(std::move(func_def)) {}
 

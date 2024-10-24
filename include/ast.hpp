@@ -3,10 +3,8 @@
 #include <memory>
 #include <string>
 
-// 全局临时变量计数器
 static int temp_counter = 0;
 
-// 获取新的临时变量名
 inline std::string new_temp() {
     return "%" + std::to_string(temp_counter++);
 }
@@ -15,11 +13,8 @@ class BaseAST {
   public:
    virtual ~BaseAST() = default;
    virtual void Dump() const = 0;
-   virtual std::string GenIR() const = 0; // 返回生成的变量名
+   virtual std::string GenIR() const = 0;
 };
-
-// 其他类定义保持不变...
-
 
 class CompUnitAST : public BaseAST {
   public:
@@ -38,10 +33,9 @@ class CompUnitAST : public BaseAST {
     std::cout << "%entry:\n";
     func_def->GenIR();
     std::cout << "}\n";
-    return "";  // 返回空，因为 CompUnitAST 不生成具体变量
+    return "";
   }
 };
-
 
 class FuncDefAST : public BaseAST {
   public:
@@ -61,10 +55,9 @@ class FuncDefAST : public BaseAST {
   }
 
   std::string GenIR() const override {
-    return block->GenIR(); // 继续生成 block 的 IR
+    return block->GenIR();
   }
 };
-
 
 class FuncTypeAST : public BaseAST {
   public:
@@ -77,10 +70,9 @@ class FuncTypeAST : public BaseAST {
   }
 
   std::string GenIR() const override {
-    return "";  // FuncTypeAST 不生成IR
+    return "";
   }
 };
-
 
 class BlockAST : public BaseAST {
   public:
@@ -95,7 +87,7 @@ class BlockAST : public BaseAST {
   }
 
   std::string GenIR() const override {
-    return stmt->GenIR(); // 继续生成语句的 IR
+    return stmt->GenIR();
   }
 };
 
@@ -112,12 +104,11 @@ class StmtAST : public BaseAST {
   }
 
    std::string GenIR() const override {
-    std::string result = number->GenIR();  // 获取表达式的最终结果
+    std::string result = number->GenIR();
     std::cout << "  ret " << result << "\n";
-    return result;  // 返回结果
+    return result;
   }
 };
-
 
 class NumberAST : public BaseAST {
 public:
@@ -130,42 +121,253 @@ public:
     }
 
     std::string GenIR() const override {
-    return std::to_string(value);  // 直接返回数字的字符串表示，不创建临时变量
+    return std::to_string(value);
 }
 
 };
 
-
 class UnaryExpAST : public BaseAST {
 public:
-    char op;  // 记录运算符
-    std::unique_ptr<BaseAST> operand;  // 运算对象
+    char op; 
+    std::unique_ptr<BaseAST> operand; 
 
     UnaryExpAST(char op, std::unique_ptr<BaseAST> operand)
         : op(op), operand(std::move(operand)) {}
 
     void Dump() const override {
-        // 输出运算表达式的结构
         std::cout << "UnaryExpAST(" << op << ", ";
         operand->Dump();
         std::cout << ")";
     }
 
     std::string GenIR() const override {
-    std::string operand_temp = operand->GenIR();  // 获取操作数的结果
+    std::string operand_temp = operand->GenIR();
 
     if (op == '-') {
-        std::string result_temp = new_temp();  // 为当前运算生成新的临时变量
+        std::string result_temp = new_temp(); 
         std::cout << "  " << result_temp << " = sub 0, " << operand_temp << "\n";
         return result_temp;
     } else if (op == '!') {
-        std::string result_temp = new_temp();  // 为当前运算生成新的临时变量
+        std::string result_temp = new_temp(); 
         std::cout << "  " << result_temp << " = eq " << operand_temp << ", 0\n";
         return result_temp;
     }
 
-    // + 运算不产生实际IR，可以忽略
-    return operand_temp;  // 对于 + 运算直接返回操作数的结果
+    return operand_temp; 
+}
+};
+
+// 新增的用于关系表达式的类
+class RelExpAST : public BaseAST {
+public:
+    std::unique_ptr<BaseAST> lhs;
+    std::string op;
+    std::unique_ptr<BaseAST> rhs;
+
+    RelExpAST(std::unique_ptr<BaseAST> lhs, std::string op, std::unique_ptr<BaseAST> rhs)
+        : lhs(std::move(lhs)), op(std::move(op)), rhs(std::move(rhs)) {}
+
+    void Dump() const override {
+        std::cout << "RelExpAST(";
+        lhs->Dump();
+        std::cout << " " << op << " ";
+        rhs->Dump();
+        std::cout << ")";
+    }
+
+    std::string GenIR() const override {
+        std::string lhs_temp = lhs->GenIR();
+        std::string rhs_temp = rhs->GenIR();
+        std::string result_temp = new_temp();
+
+        if (op == "<") {
+            std::cout << "  " << result_temp << " = lt " << lhs_temp << ", " << rhs_temp << "\n";
+        } else if (op == "<=") {
+            std::cout << "  " << result_temp << " = le " << lhs_temp << ", " << rhs_temp << "\n";
+        } else if (op == ">") {
+            std::cout << "  " << result_temp << " = gt " << lhs_temp << ", " << rhs_temp << "\n";
+        } else if (op == ">=") {
+            std::cout << "  " << result_temp << " = ge " << lhs_temp << ", " << rhs_temp << "\n";
+        }
+
+        return result_temp;
+    }
+};
+
+// 新增的用于相等表达式的类
+class EqExpAST : public BaseAST {
+public:
+    std::unique_ptr<BaseAST> lhs;
+    std::string op;
+    std::unique_ptr<BaseAST> rhs;
+
+    EqExpAST(std::unique_ptr<BaseAST> lhs, std::string op, std::unique_ptr<BaseAST> rhs)
+        : lhs(std::move(lhs)), op(std::move(op)), rhs(std::move(rhs)) {}
+
+    void Dump() const override {
+        std::cout << "EqExpAST(";
+        lhs->Dump();
+        std::cout << " " << op << " ";
+        rhs->Dump();
+        std::cout << ")";
+    }
+
+    std::string GenIR() const override {
+        std::string lhs_temp = lhs->GenIR();
+        std::string rhs_temp = rhs->GenIR();
+        std::string result_temp = new_temp();
+
+        if (op == "==") {
+            std::cout << "  " << result_temp << " = eq " << lhs_temp << ", " << rhs_temp << "\n";
+        } else if (op == "!=") {
+            std::cout << "  " << result_temp << " = ne " << lhs_temp << ", " << rhs_temp << "\n";
+        }
+
+        return result_temp;
+    }
+};
+
+//
+class LOrExpAST : public BaseAST {
+public:
+    std::unique_ptr<BaseAST> lhs;
+    std::unique_ptr<BaseAST> rhs;
+
+    LOrExpAST(std::unique_ptr<BaseAST> lhs, std::unique_ptr<BaseAST> rhs)
+        : lhs(std::move(lhs)), rhs(std::move(rhs)) {}
+
+    void Dump() const override {
+        std::cout << "LOrExpAST(";
+        lhs->Dump();
+        std::cout << " || ";
+        rhs->Dump();
+        std::cout << ")";
+    }
+
+    std::string GenIR() const override {
+    std::string lhs_temp = lhs->GenIR();
+    std::string rhs_temp = rhs->GenIR();
+    std::string lhs_cmp = new_temp();
+    std::string rhs_cmp = new_temp();
+    std::string result_temp = new_temp();  // 用来存储最终结果
+
+    // 比较 lhs 是否不为 0
+    std::cout << "  " << lhs_cmp << " = ne " << lhs_temp << ", 0\n";
+
+    // 比较 rhs 是否不为 0
+    std::cout << "  " << rhs_cmp << " = ne " << rhs_temp << ", 0\n";
+
+    // 使用按位或来模拟逻辑或
+    std::cout << "  " << result_temp << " = or " << lhs_cmp << ", " << rhs_cmp << "\n";
+
+    return result_temp;
 }
 
+};
+
+
+
+class LAndExpAST : public BaseAST {
+public:
+    std::unique_ptr<BaseAST> lhs;
+    std::unique_ptr<BaseAST> rhs;
+
+    LAndExpAST(std::unique_ptr<BaseAST> lhs, std::unique_ptr<BaseAST> rhs)
+        : lhs(std::move(lhs)), rhs(std::move(rhs)) {}
+
+    void Dump() const override {
+        std::cout << "LAndExpAST(";
+        lhs->Dump();
+        std::cout << " && ";
+        rhs->Dump();
+        std::cout << ")";
+    }
+
+    std::string GenIR() const override {
+    std::string lhs_temp = lhs->GenIR();
+    std::string rhs_temp = rhs->GenIR();
+    std::string lhs_cmp = new_temp();
+    std::string rhs_cmp = new_temp();
+    std::string result_temp = new_temp();  // 用来存储最终结果
+
+    // 比较 lhs 是否不为 0
+    std::cout << "  " << lhs_cmp << " = ne " << lhs_temp << ", 0\n";
+
+    // 比较 rhs 是否不为 0
+    std::cout << "  " << rhs_cmp << " = ne " << rhs_temp << ", 0\n";
+
+    // 使用按位与来模拟逻辑与
+    std::cout << "  " << result_temp << " = and " << lhs_cmp << ", " << rhs_cmp << "\n";
+
+    return result_temp;
+}
+
+};
+
+
+
+class AddExpAST : public BaseAST {
+public:
+    std::unique_ptr<BaseAST> lhs;
+    char op;
+    std::unique_ptr<BaseAST> rhs;
+
+    AddExpAST(std::unique_ptr<BaseAST> lhs, char op, std::unique_ptr<BaseAST> rhs)
+        : lhs(std::move(lhs)), op(op), rhs(std::move(rhs)) {}
+
+    void Dump() const override {
+        std::cout << "AddExpAST(";
+        lhs->Dump();
+        std::cout << " " << op << " ";
+        rhs->Dump();
+        std::cout << ")";
+    }
+
+    std::string GenIR() const override {
+        std::string lhs_temp = lhs->GenIR();
+        std::string rhs_temp = rhs->GenIR();
+        std::string result_temp = new_temp();
+
+        if (op == '+') {
+            std::cout << "  " << result_temp << " = add " << lhs_temp << ", " << rhs_temp << "\n";
+        } else if (op == '-') {
+            std::cout << "  " << result_temp << " = sub " << lhs_temp << ", " << rhs_temp << "\n";
+        }
+
+        return result_temp;
+    }
+};
+
+class MulExpAST : public BaseAST {
+public:
+    std::unique_ptr<BaseAST> lhs;
+    char op;
+    std::unique_ptr<BaseAST> rhs;
+
+    MulExpAST(std::unique_ptr<BaseAST> lhs, char op, std::unique_ptr<BaseAST> rhs)
+        : lhs(std::move(lhs)), op(op), rhs(std::move(rhs)) {}
+
+    void Dump() const override {
+        std::cout << "MulExpAST(";
+        lhs->Dump();
+        std::cout << " " << op << " ";
+        rhs->Dump();
+        std::cout << ")";
+    }
+
+    std::string GenIR() const override {
+        std::string lhs_temp = lhs->GenIR();
+        std::string rhs_temp = rhs->GenIR();
+        std::string result_temp = new_temp();
+
+        if (op == '*') {
+            std::cout << "  " << result_temp << " = mul " << lhs_temp << ", " << rhs_temp << "\n";
+        } else if (op == '/') {
+            std::cout << "  " << result_temp << " = div " << lhs_temp << ", " << rhs_temp << "\n";
+        } else if (op == '%') {
+            std::cout << "  " << result_temp << " = mod " << lhs_temp << ", " << rhs_temp << "\n";
+        }
+
+        return result_temp;
+    }
 };
