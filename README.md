@@ -4,11 +4,11 @@
 
 ## 🕶Compiler vs Interpreter
 
-![img](https://pic.imgdb.cn/item/6719c21fd29ded1a8c8ae318.png)
+![img](https://github.com/Aununo/An-Easy-Compiler-for-Sysy/blob/master/images/c.png)
 
 **Compiled languages**: Convert source code into machine code through a compilation process, resulting in a standalone executable file that is efficient to run.
 
-![img](https://pic.imgdb.cn/item/6719c26fd29ded1a8c8b2c3a.png)
+![img](https://github.com/Aununo/An-Easy-Compiler-for-Sysy/blob/master/images/python.png)
 
 **Interpreted languages**: Execute source code line by line using an interpreter, generally without pre-compilation. They are great for rapid development and debugging.
 
@@ -16,7 +16,7 @@
 
 ## ⚙️General Structure
 
-![img](https://pic.imgdb.cn/item/6719b894d29ded1a8c817fb8.png)
+![img](https://github.com/Aununo/An-Easy-Compiler-for-Sysy/blob/master/images/structure.png)
 
 To implement a compiler, we can divide the whole process into **THREE** main parts.
 
