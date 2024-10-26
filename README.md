@@ -32,32 +32,21 @@ The assembler takes the assembly code and converts it into machine code, creatin
 
 *Reference:* https://pku-minic.github.io/online-doc/#/.
 
-This command will help to get the mirror of **pku** practice experiment.
+This command will help to get the mirror of **pku** practice experiment. Tools are already there.
 
 ```bash
 docker pull maxxing/compiler-dev
 ```
-Tools like `flex`, `bison`, `make`, `qemu-user-static`, `LLVM-toolschain`, `koopapac`, and `autotest`... are already there.
 
 And this helps to 'move' your local project into the test environment.
 
 ```bash
 docker run -it --rm -v /home/your_path:/root/compiler maxxing/compiler-dev bash
 ```
-If wanna exit, just type `exit` or `Ctrl+D`. Test the Compiler:
-
+If wanna exit, just type `exit` or `Ctrl+D`. 
 ```bash
+# How to test?
 make
-build/compiler -koopa hello.c -o hello.koopa
-build/compiler -riscv hello.c -o hello.S
-autotest -koopa -s lv<1-9> /root/compiler
-autotest -riscv -s lv<1-9> /root/compiler
-```
-
-I use **git** to push my local project to my github.
-```bash
-git init
-git remote set-url origin git@github.com:Aununo/An-Easy-Compiler-for-Sysy.git
-git add . & git commit -m "anything"
-git push origin "branch"
+build/compiler -koopa test/hello.c -o test/hello.koopa
+autotest -koopa -s lv1 /root/compiler
 ```
