@@ -3,6 +3,8 @@
 #include <memory>
 #include <string>
 
+using namespace std;
+
 static int temp_counter = 0;
 
 inline std::string new_temp() {
@@ -157,7 +159,6 @@ public:
 }
 };
 
-// 新增的用于关系表达式的类
 class RelExpAST : public BaseAST {
 public:
     std::unique_ptr<BaseAST> lhs;
@@ -194,7 +195,6 @@ public:
     }
 };
 
-// 新增的用于相等表达式的类
 class EqExpAST : public BaseAST {
 public:
     std::unique_ptr<BaseAST> lhs;
@@ -227,7 +227,7 @@ public:
     }
 };
 
-//
+
 class LOrExpAST : public BaseAST {
 public:
     std::unique_ptr<BaseAST> lhs;
@@ -249,15 +249,10 @@ public:
     std::string rhs_temp = rhs->GenIR();
     std::string lhs_cmp = new_temp();
     std::string rhs_cmp = new_temp();
-    std::string result_temp = new_temp();  // 用来存储最终结果
+    std::string result_temp = new_temp();  
 
-    // 比较 lhs 是否不为 0
     std::cout << "  " << lhs_cmp << " = ne " << lhs_temp << ", 0\n";
-
-    // 比较 rhs 是否不为 0
     std::cout << "  " << rhs_cmp << " = ne " << rhs_temp << ", 0\n";
-
-    // 使用按位或来模拟逻辑或
     std::cout << "  " << result_temp << " = or " << lhs_cmp << ", " << rhs_cmp << "\n";
 
     return result_temp;
@@ -288,15 +283,11 @@ public:
     std::string rhs_temp = rhs->GenIR();
     std::string lhs_cmp = new_temp();
     std::string rhs_cmp = new_temp();
-    std::string result_temp = new_temp();  // 用来存储最终结果
+    std::string result_temp = new_temp(); 
 
-    // 比较 lhs 是否不为 0
+
     std::cout << "  " << lhs_cmp << " = ne " << lhs_temp << ", 0\n";
-
-    // 比较 rhs 是否不为 0
     std::cout << "  " << rhs_cmp << " = ne " << rhs_temp << ", 0\n";
-
-    // 使用按位与来模拟逻辑与
     std::cout << "  " << result_temp << " = and " << lhs_cmp << ", " << rhs_cmp << "\n";
 
     return result_temp;

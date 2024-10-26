@@ -3,3 +3,4 @@ fun @main(): i32 {
   %0 = le 1, 2
   ret %0
 }
+

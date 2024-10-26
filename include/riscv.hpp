@@ -1,16 +1,8 @@
-#include <cassert>
-#include <cstdio>
+#pragma once
 #include <iostream>
-#include <memory>
 #include <string>
-#include <sstream>
-#include <koopa.h>
-
-#include "../include/ast.hpp"
-using namespace std;
-
-extern FILE *yyin;
-extern int yyparse(unique_ptr<BaseAST> &ast);
+#include <memory>
+#include <vector>
 
 void VisitProgram(const koopa_raw_program_t &program);
 void VisitSlice(const koopa_raw_slice_t &slice);
@@ -19,53 +11,6 @@ void VisitBasicBlock(const koopa_raw_basic_block_t &bb);
 void VisitValue(const koopa_raw_value_t &value);
 void VisitReturn(const koopa_raw_return_t &ret);
 void VisitInteger(const koopa_raw_integer_t &integer);
-
-int main(int argc, const char *argv[]) {
-  assert(argc == 5);
-  auto input = argv[2];
-  auto output = argv[4];
-
-  yyin = fopen(input, "r");
-  assert(yyin);
-
-  unique_ptr<BaseAST> ast;
-  auto ret = yyparse(ast);
-  assert(!ret);
-
-  stringstream ir_stream;
-  streambuf* old_buf = cout.rdbuf(ir_stream.rdbuf()); 
-
-  // 生成 Koopa IR
-  ast->GenIR(); 
-
-  cout.rdbuf(old_buf);
-
-  // 将 Koopa IR 转换为字符串
-  string ir_code = ir_stream.str();
-  const char* str = ir_code.c_str();  
-
-  // 解析 Koopa IR
-  koopa_program_t program;
-  koopa_error_code_t ret_parse = koopa_parse_from_string(str, &program);
-  assert(ret_parse == KOOPA_EC_SUCCESS);
-
-  // 构建 raw program
-  koopa_raw_program_builder_t builder = koopa_new_raw_program_builder();
-  koopa_raw_program_t raw = koopa_build_raw_program(builder, program);
-
-  // 释放 Koopa IR 占用的内存
-  koopa_delete_program(program);
-
-  // 处理 raw program，生成 RISC-V 汇编
-  freopen(output, "w", stdout);
-  VisitProgram(raw);
-
-  // 处理完成，释放 raw program builder 占用的内存
-  koopa_delete_raw_program_builder(builder);
-
-  return 0;
-}
-
 
 void VisitProgram(const koopa_raw_program_t &program) {
   // 访问所有函数
