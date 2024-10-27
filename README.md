@@ -2,30 +2,6 @@
 
 (Unfinished) A very first quick try for implementing a compiler. 😊
 
-## 🕶Compiler vs Interpreter
-
-![img](https://github.com/Aununo/An-Easy-Compiler-for-Sysy/blob/master/images/c.png)
-
-**Compiled languages**: Convert source code into machine code through a compilation process, resulting in a standalone executable file that is efficient to run.
-
-![img](https://github.com/Aununo/An-Easy-Compiler-for-Sysy/blob/master/images/python.png)
-
-**Interpreted languages**: Execute source code line by line using an interpreter, generally without pre-compilation.
-
-**Blurred boundary**: Modern languages increasingly use both interpretation and compilation techniques to achieve better performance and flexibility, making the distinction between the two less rigid.
-
-## ⚙️General Structure
-
-![img](https://github.com/Aununo/An-Easy-Compiler-for-Sysy/blob/master/images/structure.png)
-
-We can divide the whole process into **THREE** main parts.
-
-- ***FrontEnd:*** Mainly use **flex & bison**. Through **lexical and syntactic analysis**, the **source code**(SRC) is parsed into an **abstract syntax tree** (AST). Through **semantic** analysis, the AST is scanned to check whether there are semantic errors.
-- ***MidEnd:*** **IR**(Intermediate Representation) is a lower-level code format that simplifies the structure of the original SRC, making it easier(M*N to M+N) for the backend to process. It performs **optimizations**, such as DCE, Constant Propagation etc.
-- ***BackEnd:*** Takes the optimized IR and translates it into **assembly code**(ASM) for the target architecture (machine-specific).
-
-The assembler takes the assembly code and converts it into machine code, creating an **executable** binary file, that machines can directly run.
-
 ## 🐳Docker
 
 *Language:* C++; *IDE:* VS Code; *Platform:* Ubuntu 24.04, WSL; 
